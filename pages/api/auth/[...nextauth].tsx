@@ -68,7 +68,7 @@ export default NextAuth({
       // Access token has expired, try to update it
       return refreshAccessToken(token);
     },
-    async session({ session, token: { user, error: tokenError } }) {
+    async session({ session, token: { user, error: tokenError, accessToken } }) {
       session.user = {
         id: user?.id,
         email: user?.email,
@@ -78,7 +78,11 @@ export default NextAuth({
       };
       session.clientId = process.env.ZITADEL_CLIENT_ID;
       session.error = tokenError;
+      (session as any).accessToken = accessToken;
       return session;
     },
   },
+  session: {
+    strategy: 'jwt',
+  }
 });
