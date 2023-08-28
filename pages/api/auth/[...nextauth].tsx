@@ -37,7 +37,7 @@ export default NextAuth({
       clientSecret: process.env.ZITADEL_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: `openid email profile offline_access`,
+          scope: `openid email profile urn:zitadel:iam:user:metadata urn:zitadel:iam:org:project:roles`, //offline_access
         },
       },
       async profile(profile) {
@@ -58,6 +58,7 @@ export default NextAuth({
       token.user ??= user;
       token.accessToken ??= account?.access_token;
       token.refreshToken ??= account?.refresh_token;
+      token.idToken ??= account?.id_token;
       token.expiresAt ??= (account?.expires_at ?? 0) * 1000;
       token.error = undefined;
       // Return previous token if the access token has not expired yet

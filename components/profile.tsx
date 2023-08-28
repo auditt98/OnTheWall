@@ -58,6 +58,7 @@ export default function Profile() {
               <br />
             </p>
           </div>
+          { (session as any)?.accessToken }
           {user && user[scope] && (
             <div className="user-roles-row">[{user[scope] && Object.keys(user[scope]).join(',')}]</div>
           )}
