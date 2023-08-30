@@ -1,10 +1,89 @@
+'use client';
 import Head from 'next/head';
-import Image from 'next/image';
-
-import Profile from '../components/profile';
 import styles from '../styles/Home.module.css';
+import { useSpring, animated, to } from '@react-spring/web';
+import { useGesture } from 'react-use-gesture';
+import { useEffect, useMemo, useRef } from 'react';
+import IconEdit from '../components/icons/edit';
 
 export default function Home() {
+  const calcX = useMemo(
+    () => (y: number, ly: number) => {
+      if (typeof window === 'undefined') {
+        return 0;
+      }
+
+      return -(y - ly - window.innerHeight / 2) / 20;
+    },
+    [],
+  );
+  const calcY = useMemo(
+    () => (x: number, lx: number) => {
+      if (typeof window === 'undefined') {
+        return 0;
+      }
+      return (x - lx - window.innerWidth / 2) / 20;
+    },
+    [],
+  );
+
+  const wheel = useMemo(
+    () => (y: number) => {
+      if (typeof window === 'undefined') {
+        return `translateY(0px)`;
+      }
+      const imgHeight = window?.innerWidth * 0.3 - 20;
+      return `translateY(${-imgHeight * (y < 0 ? 6 : 1) - (y % (imgHeight * 5))}px`;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const preventDefault = (e: Event) => e.preventDefault();
+    document.addEventListener('gesturestart', preventDefault);
+    document.addEventListener('gesturechange', preventDefault);
+
+    return () => {
+      document.removeEventListener('gesturestart', preventDefault);
+      document.removeEventListener('gesturechange', preventDefault);
+    };
+  }, []);
+
+  const domTarget = useRef(null);
+  const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(() => ({
+    rotateX: 0,
+    rotateY: 0,
+    rotateZ: 0,
+    scale: 1,
+    zoom: 0,
+    x: 0,
+    y: 0,
+    config: { mass: 2, tension: 350, friction: 40 },
+  }));
+
+  const [{ wheelY }, wheelApi] = useSpring(() => ({ wheelY: 0 }));
+
+  useGesture(
+    {
+      onDrag: ({ active, offset: [x, y] }) => api({ x, y, rotateX: 0, rotateY: 0, scale: active ? 1 : 1.1 }),
+      onPinch: ({ offset: [d, a] }) => api({ zoom: d / 200, rotateZ: a }),
+      onMove: ({ xy: [px, py], dragging }) =>
+        !dragging &&
+        api({
+          rotateX: calcX(py, y.get()),
+          rotateY: calcY(px, x.get()),
+          scale: 1.1,
+        }),
+      onHover: ({ hovering }) => !hovering && api({ rotateX: 0, rotateY: 0, scale: 1 }),
+      onWheel: ({ event, offset: [, y] }) => {
+        event.preventDefault();
+        wheelApi.set({ wheelY: y });
+      },
+      onClick: () => api({ rotateZ: rotateZ.get() + 180 }),
+    },
+    { domTarget, eventOptions: { passive: false } },
+  );
+
   return (
     <div className={styles.container}>
       <Head>
@@ -14,25 +93,76 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://github.com/zitadel/zitadel-examples/tree/main/nextjs">Next.js with ZITADEL!</a>
-        </h1>
+        <animated.div
+          ref={domTarget}
+          className={'album group overflow-hidden '}
+          style={{
+            transform: 'perspective(600px)',
+            x,
+            y,
+            scale: to([scale, zoom], (s, z) => s + z),
+            rotateX,
+            rotateY,
+            rotateZ,
+          }}
+        >
+          <animated.div className="flex flex-row bg-white absolute bottom-0 w-full pt-2 px-1 select-none opacity-0 transition-opacity duration-300 ease-linear group-hover:opacity-90">
+            <div className="text-base truncate">Long Album Name Name Name</div>
+          </animated.div>
 
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <Profile />
+          <animated.div onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            e.nativeEvent.stopImmediatePropagation();
+            e.bubbles = false;
+            console.log('hello')
+          }} className=" bg-white rounded-lg absolute top-1 right-1 p-2 select-none opacity-0 transition-opacity duration-300 ease-linear group-hover:opacity-100">
+            <IconEdit className={'w-[22px] h-[22px]'} style={{}}></IconEdit>
+          </animated.div>
+          <animated.div className={'columns-3 gap-1 '}>
+            <img
+              className="w-full aspect-square select-none pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+            <img
+              className="w-full aspect-square select-none pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+            <img
+              className="w-full aspect-square select-none pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+            <img
+              className="w-full aspect-square select-none pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+            <img
+              className="w-full aspect-square select-none pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+            <img
+              className="w-full aspect-square select-non pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+            <img
+              className="w-full aspect-square select-none pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+            <img
+              className="w-full aspect-square select-none pointer-events-none"
+              draggable={false}
+              src="https://images.unsplash.com/photo-1493612276216-ee3925520721?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+            ></img>
+          </animated.div>
+        </animated.div>
       </main>
-
-      <footer className={styles.footer}>
-        <a href="https://zitadel.ch" target="_blank" rel="noopener noreferrer">
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/zitadel-logo-dark.svg" alt="Zitadel Logo" height={40} width={147.5} />
-          </span>
-        </a>
-      </footer>
     </div>
   );
 }

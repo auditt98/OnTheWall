@@ -20,7 +20,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       refreshToken: refresh_token, // Fall back to old refresh token
     };
   } catch (error) {
-    console.error('Error during refreshAccessToken', error);
+    // console.error('Error during refreshAccessToken', error);
 
     return {
       ...token,
@@ -37,7 +37,7 @@ export default NextAuth({
       clientSecret: process.env.ZITADEL_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: `openid email profile urn:zitadel:iam:user:metadata urn:zitadel:iam:org:project:roles`, //offline_access
+          scope: `openid email profile offline_access`, //offline_access
         },
       },
       async profile(profile) {

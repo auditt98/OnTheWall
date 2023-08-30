@@ -40,7 +40,6 @@ export default function Profile() {
           </button>
         </>
       )}
-      {(loading || isValidating) && <span>loading...</span>}
       {user && (
         <>
           <div className="profile-row">
@@ -58,7 +57,8 @@ export default function Profile() {
               <br />
             </p>
           </div>
-          { (session as any)?.accessToken }
+          {(session as any)?.accessToken}
+          <div>SUB: { user && user.sub }</div>
           {user && user[scope] && (
             <div className="user-roles-row">[{user[scope] && Object.keys(user[scope]).join(',')}]</div>
           )}
