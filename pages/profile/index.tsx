@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import styles from '../styles/Home.module.css';
-import Profile from '../components/profile';
+import Profile from '../../components/Profile';
 
 export default function ProfileView() {
   return (

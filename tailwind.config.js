@@ -12,6 +12,9 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    container: {
+      padding: '4rem'
+    }
   },
   darkMode: "class",
   plugins: [require("tw-elements/dist/plugin.cjs")]
