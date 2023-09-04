@@ -1,6 +1,5 @@
 'use client';
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
 import { useSpring, animated, to } from '@react-spring/web';
 import { useGesture } from 'react-use-gesture';
 import { useEffect, useMemo, useRef } from 'react';
@@ -9,61 +8,20 @@ import { FolderPlusIcon } from '@heroicons/react/24/outline';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { Dock } from '../components/Dock';
 import { DockCard } from '../components/DockCard';
+import { useGetAlbumsQuery } from '../redux/apis/albumAPI';
+import { useSession } from 'next-auth/react';
 
 export default function Home() {
-  // useEffect(() => {
-  //   const preventDefault = (e: Event) => e.preventDefault();
-  //   document.addEventListener('gesturestart', preventDefault);
-  //   document.addEventListener('gesturechange', preventDefault);
+  const { data: session, status } = useSession();
+  const { data } = useGetAlbumsQuery({ token: session['accessToken'] });
 
-  //   return () => {
-  //     document.removeEventListener('gesturestart', preventDefault);
-  //     document.removeEventListener('gesturechange', preventDefault);
-  //   };
-  // }, []);
+  useEffect(() => {
+    console.log(session);
+  }, [session]);
 
-  // const domTarget = useRef(null);
-  // const btnAddAlbumRef = useRef(null);
-  // const [{ x, y, rotateX, rotateY, rotateZ, zoom, scale }, api] = useSpring(() => ({
-  //   rotateX: 0,
-  //   rotateY: 0,
-  //   rotateZ: 0,
-  //   scale: 1,
-  //   zoom: 0,
-  //   x: 0,
-  //   y: 0,
-  //   config: { mass: 2, tension: 350, friction: 40 },
-  // }));
-
-  // const [
-  //   { x: btnX, y: btnY, rotateX: btnRotateX, rotateY: btnRotateY, rotateZ: btnRotateZ, zoom: btnZoom, scale: btnScale },
-  //   btnAPI,
-  // ] = useSpring(() => ({
-  //   rotateX: 0,
-  //   rotateY: 0,
-  //   rotateZ: 0,
-  //   scale: 1,
-  //   zoom: 0,
-  //   x: 0,
-  //   y: 0,
-  //   config: { mass: 10, tension: 350, friction: 40 },
-  // }));
-
-  // const [{ wheelY }, wheelApi] = useSpring(() => ({ wheelY: 0 }));
-
-  // useGesture(
-  //   {
-  //     onMouseDown: () => btnAPI({ scale: 1 }),
-  //     onPinch: ({ offset: [d, a] }) => btnAPI({ zoom: d / 200, rotateZ: a }),
-  //     onHover: ({ hovering }) => !!hovering && btnAPI({ rotateX: 0, rotateY: 0, scale: 1.1 }),
-  //     onMouseLeave: () => btnAPI({ rotateX: 0, rotateY: 0, scale: 1 }),
-  //     onClick: ({ event }) => {
-  //       btnAPI({ scale: 1 });
-  //     },
-  //   },
-  //   { domTarget: btnAddAlbumRef, eventOptions: { passive: false } },
-  // );
-
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
   return (
     <div className={`h-screen w-screen overflow-hidden relative`}>
       <Head>
@@ -73,39 +31,19 @@ export default function Home() {
       </Head>
       <div className="container mt-3 mx-auto"></div>
       <Dock>
-        <DockCard text='Create Album' key={'create_album'}>
+        <DockCard text="Create Album" key={'create_album'}>
           <FolderPlusIcon className="m-2"></FolderPlusIcon>
         </DockCard>
-        <DockCard key={'sdfgjsfdg'}>
+        <DockCard key={'search_album'}>
           <div>Hello</div>
         </DockCard>
-        <DockCard key={'afsd'}>
+        <DockCard key={'sort_album'}>
           <div>Hello</div>
         </DockCard>
-        <DockCard key={'afsdg'}>
+        <DockCard key={'dark_mode'}>
           <div>Hello</div>
         </DockCard>
       </Dock>
-      {/* <div className="absolute dock bottom-0 flex mb-8">
-        <animated.button
-          ref={btnAddAlbumRef}
-          className="animated-button mx-2 px-4 py-4 bg-white gap-2 rounded-lg text-lg flex items-center justify-center"
-          style={{
-            // background: 'linear-gradient(225deg, #ffffff, #dadada)',
-            boxShadow: ' 0px 10px 30px -5px rgba(0, 0, 0, 0.3)',
-            transform: 'perspective(600px)',
-            x: btnX,
-            y: btnY,
-            scale: to([btnScale, btnZoom], (s, z) => s + z),
-            rotateX: btnRotateX,
-            rotateY: btnRotateY,
-            rotateZ: btnRotateZ,
-          }}
-        >
-          <PlusIcon className="w-6 h-6"></PlusIcon>
-          <span>Create Album</span>
-        </animated.button>
-      </div> */}
     </div>
   );
 }
