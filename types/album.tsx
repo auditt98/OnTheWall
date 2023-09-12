@@ -7,11 +7,11 @@ export interface IAlbum {
 	name?: string;
 	users?: IUser[];
 	photos?: IPhoto[];
-	CreatedAt?: string;
-	UpdatedAt?: string;
-	Likes?: number;
-	Comments?: IAppComment[];
-
+	created_at?: string;
+	updated_at?: string;
+	likes?: number;
+	comments?: IAppComment[];
+	likes_count?: number;
 }
 
 export interface INewAlbum extends IAlbum {

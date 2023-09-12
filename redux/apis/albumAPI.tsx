@@ -6,14 +6,21 @@ export const albumApi = createApi({
   reducerPath: 'albumApi',
   tagTypes: ['albums'],
   endpoints: (build) => ({
-    getAlbums: build.query<IAlbum[], { token: string }>({
+    searchAlbums: build.query<IAlbum[], { token: string }>({
       query: ({ token }) => {
         return {
-          url: '/v1/albums',
-          method: 'GET',
+          url: '/v1/albums/search',
+          method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          body: {
+            "$filters": {},
+            "$sort": [],
+            "$page": 1,
+            "$per_page": 20,
+            "$populate": ["Photos"]
+          }
         };
       },
       transformResponse: (response: { data: IAlbum[] }) => {
@@ -39,4 +46,4 @@ export const albumApi = createApi({
   }),
 });
 
-export const { useGetAlbumsQuery, useCreateAlbumMutation } = albumApi;
+export const { useSearchAlbumsQuery, useCreateAlbumMutation } = albumApi;
