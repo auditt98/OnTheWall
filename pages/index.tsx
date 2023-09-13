@@ -19,7 +19,7 @@ const Home = () => {
   const { data } = useSearchAlbumsQuery({ token: session?.['accessToken'] });
 
   useEffect(() => {
-    console.log(data);
+    // console.log(data);
   }, [data]);
   return (
     <div className={`h-screen w-screen overflow-hidden relative`}>

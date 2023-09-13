@@ -5,7 +5,7 @@ module.exports = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: process.env.ZITADEL_ISSUER.slice(8),
+        hostname: process.env.NEXT_PUBLIC_ZITADEL_ISSUER.slice(8),
         pathname: '/assets/v1/**',
       },
     ],

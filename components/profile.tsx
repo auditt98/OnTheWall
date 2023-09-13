@@ -1,5 +1,7 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 
 const loadData = (url: string) =>
@@ -22,6 +24,14 @@ export default function Profile() {
 
   const scope = 'urn:zitadel:iam:org:project:roles';
 
+  useEffect(() => {
+    // console.log("session", session)
+  }, [session]);
+
+  useEffect(() => {
+    // console.log("user", user)
+  }, [user]);
+
   return (
     <>
       {!session && (
@@ -42,7 +52,7 @@ export default function Profile() {
       )}
       {user && (
         <>
-          <div className="profile-row">
+          <div className="">
             {user.picture && (
               <Image
                 style={{ borderRadius: '50vw', marginRight: '1rem' }}
@@ -58,10 +68,20 @@ export default function Profile() {
             </p>
           </div>
           {(session as any)?.accessToken}
-          <div>SUB: { user && user.sub }</div>
+          <div>SUB: {user && user.sub}</div>
           {user && user[scope] && (
             <div className="user-roles-row">[{user[scope] && Object.keys(user[scope]).join(',')}]</div>
           )}
+          <div className='px-6 py-2 bg-purple-200 my-4 w-fit rounded-md'>
+            <Link
+              target='_blank'
+              className=" "
+              href={`${process.env.NEXT_PUBLIC_ZITADEL_ISSUER}/ui/console/users/me`}
+            >
+              Update profile
+            </Link>
+          </div>
+
           <button onClick={() => signOut()}>Sign out</button>
         </>
       )}
